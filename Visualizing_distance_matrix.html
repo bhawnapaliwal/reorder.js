@@ -26,11 +26,11 @@ rect.highlight {
 }
 
 </style>
-<script src="lib/d3.v3.js"></script>
-<script src="lib/science.v1.js"></script>
-<script src="lib/tiny-queue.js"></script>
-<script src="reorder.v1.js"></script>
-<script src="matrix1.js"></script>
+<script src="../../lib/d3.v3.js"></script>
+<script src="../../lib/science.v1.js"></script>
+<script src="../../lib/tiny-queue.js"></script>
+<script src="../../reorder.v1.js"></script>
+<script src="../matrix1.js"></script>
 <script src="https://d3js.org/d3-color.v1.min.js"></script>
 <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -58,6 +58,7 @@ rect.highlight {
 </select>
 <button onClick="zoom_in()">Zoom In</button>
 <button onClick="zoom_out()">Zoom Out</button>
+<button onClick="smaller()">Sub Sample</button>
 
 <script>
 var margin = {top: 80, right: 0, bottom: 10, left: 80},
@@ -75,7 +76,16 @@ var x = d3.scale.ordinal().rangeBands([0, width]),
 function zoom_in(){
     width = 1.5*width;
     height = 1.5*height;
+    // console.log(" width = "+width);
      x = d3.scale.ordinal().domain(d).rangeBands([0, width]);
+    // console.log(imp);
+    // console.log("x = "+x(1));
+    // console.log("imp = "+imp(1));
+    // console.log("scale1 = "+scale1(1));
+    // x = d3.scale.ordinal().rangeBands([0, 1080]),
+    // z = d3.scale.linear().domain([0,1]).range([0,1]).clamp(true),
+    // c = d3.scale.category10();
+    // console.log("yp...."+x.rangeBand());
      d3.select("body").selectAll("svg").remove();
 window.svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -102,6 +112,17 @@ window.svg = d3.select("body").append("svg")
     console.log("hey");
     d3.json("sub_matrix.json", loadJson);
 
+}
+function smaller(){
+  d3.select("body").selectAll("svg").remove();
+  window.svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    console.log("hey");
+    d3.json("sub_matrix.json", loadJson_small);
 }
 // function scale1(x) {
 //     range=[1,1080];
