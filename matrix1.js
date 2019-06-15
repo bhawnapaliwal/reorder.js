@@ -1,12 +1,13 @@
-var m1;
 function matrix(json) {
   var matrix = [],
       nodes = json.nodes,
       n = nodes.length;
       console.log("n = "+n);
-
-  // Compute index per node.
-  console.log("hello");
+var colour_map={
+  "red_blue": d3.interpolateRdBu,
+  "purple_green": d3.interpolatePRGn,
+  "seq_blue": d3.interpolateBlues
+};
   nodes.forEach(function(node, i) {
     node.index = i;
     node.count = 0;
@@ -14,15 +15,8 @@ function matrix(json) {
     console.log("i = "+i+"matrix[i][98]: "+matrix[i][98].z);
   });
 
-  // Convert links to matrix; count character occurrences.
-  json.links.forEach(function(link) {
-    // console.log("link.source: "+link.source);
-    // console.log("link.target: "+link.target);
-    // console.log("value: "+matrix[link.source][link.target]);  
+  json.links.forEach(function(link) {  
     matrix[link.source][link.target].z += link.value;
-    // matrix[link.target][link.source].z += link.value;
-    // matrix[link.source][link.source].z += link.value;
-    // matrix[link.target][link.target].z += link.value;
     nodes[link.source].count += link.value;
     nodes[link.target].count += link.value;
   });
@@ -95,8 +89,7 @@ function matrix(json) {
   return nodes.map(function(n) { return n.spectral; });
     }
 
-  // Precompute the orders.
-    var orders = {
+     var orders = {
   name: d3.range(n).sort(function(a, b) { return d3.ascending(parseInt(nodes[a].name), parseInt(nodes[b].name)); }),
   count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
   group: d3.range(n).sort(function(a, b) {
@@ -110,7 +103,6 @@ function matrix(json) {
   spectral: computeSpectral
     };
 
-  // The default sort order.
   x.domain(orders.name);
   svg.append("rect")
       .attr("class", "background")
@@ -161,11 +153,108 @@ function matrix(json) {
         .attr("width", x.rangeBand())
         .attr("height", x.rangeBand())
         .style("fill-opacity", function(d) { return z(d.z); })
-        .style("fill", function(d) { return d3.interpolateRdBu(d.z); })
+        .style("fill", function(d) { return d3.interpolatePiYG(d.z); })
         .on("mouseover", mouseover)
-        .on("mouseout", mouseout);
+        .on("mouseout", mouseout)
+        .on("dblclick",fun);
   }
+function fun(p)
+{
+  console.log("called");
+  d3.select("#svg2").remove();
+  var len = document.getElementById('a').value;
+  console.log("len: "+len);
+  alert("hi p is: "+p.x+" "+p.y+" "+p.z+" doc: "+document.getElementById('a').value);
+  console.log("alerted");
+  d3.select("body").append("svg")
+    .attr("id","svg2")
+    .attr("width", 720 + margin.left + margin.right)
+    .attr("height", 720 + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var _matrix=[];
+    d3.select("#svg2").select("g").append("rect")
+      .attr("class", "background")
+      .attr("width", 720)
+      .attr("height",720);
+    var i,j,i1=0,j1=0;
+    var e = document.getElementById("order");
+    var corder = e.options[e.selectedIndex].value;
+    console.log("corder: "+corder);
+    console.log("orders[corder]:");
+    console.log(orders[corder]);
+    console.log("orders[corder][0]:");
+    console.log(orders[corder][0]);
+    console.log("orders:");
+    console.log(orders);
+    console.log(orders[corder]);
+    for(i=0;i<len;i++)
+      _matrix[i] = d3.range(len).map(function(j) { return {x: j, y: i, z: 0}; });
+    for(i=p.x;i<parseInt(p.x)+parseInt(len);i++)
+    {
+      j1=0;
+      console.log("p.y: "+p.y);
+      console.log("p.y+len: "+(parseInt(p.y)+parseInt(len)));
+      for(j=p.y;j<(parseInt(p.y)+parseInt(len));j++)
+      {
+        console.log("i1: "+i1+" i: "+i);
+        console.log("j1: "+j1+" j: "+j);
+        _matrix[i1][j1].z += matrix[orders[corder][i]][orders[corder][j]].z;
+        j1++;
+      }
+      i1++;
+    }
+    var d=[];
+    for (i = 0; i < parseInt(len); i++) {
+      d.push(i);
+    }
+    var y = d3.scale.ordinal().rangeBands([0, 720]);
+    y.domain(d);
+    console.log("_matrix: ");
+    console.log(_matrix);
+    var row = d3.select("#svg2").select("g").selectAll(".row")
+      .data(_matrix)
+    .enter().append("g")
+      .attr("id", function(d, i) { return "row"+i; })
+      .attr("class", "row")
+      .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; })
+      .each(row);
+    row.append("line")
+      .attr("x2", width);
+    row.append("text")
+      .attr("x", -6)
+      .attr("y", y.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .text(function(d, i) { return orders[corder][parseInt(p.y)+i]; });
+    var column = d3.select("#svg2").select("g").selectAll(".column")
+      .data(_matrix)
+    .enter().append("g")
+      .attr("id", function(d, i) { return "col"+i; })
+      .attr("class", "column")
+      .attr("transform", function(d, i) { return "translate(" + y(i) + ")rotate(-90)"; });
+    column.append("line")
+      .attr("x1", -width);
 
+    column.append("text")
+      .attr("x", 6)
+      .attr("y", y.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "start")
+      .text(function(d, i) { return orders[corder][parseInt(p.y)+i]; });
+    function row(row) {
+    var cell = d3.select(this).selectAll(".cell")
+    .data(row.filter(function(d) { return d.z; }))
+      .enter().append("rect")
+        .attr("class", "cell")
+        .attr("x", function(d) { return y(d.x); })
+        .attr("width", y.rangeBand())
+        .attr("height", y.rangeBand())
+        .style("fill-opacity", function(d) { return z(d.z); })
+        .style("fill", function(d) { return d3.interpolatePiYG(d.z); });
+  }
+}
   function mouseover(p) {
     d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
     d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
@@ -192,10 +281,15 @@ function matrix(json) {
     var currentOrder = 'name';
 
     function order(value) {
+      console.log("value:");
+      console.log(value);
+      console.log("orders[value]:");
+      console.log(orders[value]);
   var o = orders[value];
   currentOrder = value;
   
   if (typeof o === "function") {
+    console.log("o="+o);
       orders[value] = o.call();
   }
   x.domain(orders[value]);
@@ -227,13 +321,7 @@ function matrix(json) {
       order("leafOrderDist");
       //d3.select("#order").property("selectedIndex", 4);
   }
-
-  // leafOrder.forEach(function(lo, i) {
-  //      nodes[lo].leafOrder = i;
-  //  });
-  //  orders.leafOrder = d3.range(n).sort(function(a, b) {
-  //      return nodes[b].leafOrder - nodes[a].leafOrder; });
-    }
+  }
 
     matrix.order = order;
     matrix.distance = distance;
@@ -272,6 +360,7 @@ function smaller_matrix(matrix)
     }
   }
   console.log("hi");
+  console.log("matrix_:");
   console.log(mat_new);
   return mat_new;
 }
@@ -425,9 +514,98 @@ function matrix2(matrix)
         .style("fill-opacity", function(d) { return z(d.z); })
         .style("fill", function(d) { return d3.interpolateRdBu(d.z); })
         .on("mouseover", mouseover)
-        .on("mouseout", mouseout);
+        .on("mouseout", mouseout)
+        .on("dblclick",fun);
   }
+  function fun(p)
+{
+  d3.select("#svg2").remove();
+  var len = document.getElementById('a').value;
+  console.log("len: "+len);
+  alert("hi p is: "+p.x+" "+p.y+" "+p.z+" doc: "+document.getElementById('a').value);
+  console.log("alerted");
+  d3.select("body").append("svg")
+    .attr("id","svg2")
+    .attr("width", 720 + margin.left + margin.right)
+    .attr("height", 720 + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var _matrix=[];
+    d3.select("#svg2").select("g").append("rect")
+      .attr("class", "background")
+      .attr("width", 720)
+      .attr("height",720);
+    var i,j,i1=0,j1=0;
+    for(i=0;i<len;i++)
+      _matrix[i] = d3.range(len).map(function(j) { return {x: j, y: i, z: 0}; });
+    for(i=p.x;i<parseInt(p.x)+parseInt(len);i++)
+    {
+      j1=0;
+      console.log("p.y: "+p.y);
+      console.log("p.y+len: "+(parseInt(p.y)+parseInt(len)));
+      for(j=p.y;j<(parseInt(p.y)+parseInt(len));j++)
+      {
+        console.log("i1: "+i1+" i: "+i);
+        console.log("j1: "+j1+" j: "+j);
+        _matrix[i1][j1].z += matrix[i][j].z;
+        j1++;
+      }
+      i1++;
+    }
+    var d=[];
+    for (i = 0; i < parseInt(len); i++) {
+      d.push(i);
+    }
+    var y = d3.scale.ordinal().rangeBands([0, 720]);
+    y.domain(d);
+    console.log("_matrix: ");
+    console.log(_matrix);
+    var row = d3.select("#svg2").select("g").selectAll(".row")
+      .data(_matrix)
+    .enter().append("g")
+      .attr("id", function(d, i) { return "row"+i; })
+      .attr("class", "row")
+      .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; })
+      .each(row);
+    row.append("line")
+      .attr("x2", width);
+    row.append("text")
+      .attr("x", -6)
+      .attr("y", y.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "end")
+      .text(function(d, i) { return p.y+i; });
+    var column = d3.select("#svg2").select("g").selectAll(".column")
+      .data(_matrix)
+    .enter().append("g")
+      .attr("id", function(d, i) { return "col"+i; })
+      .attr("class", "column")
+      .attr("transform", function(d, i) { return "translate(" + y(i) + ")rotate(-90)"; });
+    column.append("line")
+      .attr("x1", -width);
 
+    column.append("text")
+      .attr("x", 6)
+      .attr("y", y.rangeBand() / 2)
+      .attr("dy", ".32em")
+      .attr("text-anchor", "start")
+      .text(function(d, i) { return p.x+i; });
+    function row(row) {
+    var cell = d3.select(this).selectAll(".cell")
+    .data(row.filter(function(d) { return d.z; }))
+      .enter().append("rect")
+        .attr("class", "cell")
+        .attr("x", function(d) { return y(d.x); })
+        .attr("width", y.rangeBand())
+        .attr("height", y.rangeBand())
+        .style("fill-opacity", function(d) { return z(d.z); })
+        .style("fill", function(d) { return d3.interpolateRdBu(d.z); });
+  }
+  console.log("printing:");
+  console.log((p+1).x);
+ 
+}
   function mouseover(p) {
     d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
     d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
@@ -528,10 +706,6 @@ function loadJson(json) {
      m1 = matrix(json);
     console.log("mat:");
     console.log(m1);
-//    mat.timeout = setTimeout(function() {
-//  mat.order("group");
-//  d3.select("#order").property("selectedIndex", 2).node().focus();
-//    }, 5000);
 
     d3.select("#order").on("change", function() {
 //  clearTimeout(mat.timeout);
