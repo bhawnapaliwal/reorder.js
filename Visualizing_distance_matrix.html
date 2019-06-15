@@ -59,24 +59,24 @@ rect.highlight {
 <button onClick="zoom_in()">Zoom In</button>
 <button onClick="zoom_out()">Zoom Out</button>
 <button onClick="smaller()">Sub Sample</button>
-
+<br>
+window size: <input  name="a" id="a"><br>
+  Colour Scheme: <select id="cs">
+    <option value="red_blue">Red-Blue</option>
+    <option value="purple_green">Purple-Green</option>
+    <option value="seq_blue">Sequential Blue</option>
+  </select>
 <script>
 var margin = {top: 80, right: 0, bottom: 10, left: 80},
     width = 720,
     height = 720;
-var d=[],i;
-for (i = 0; i < 11; i++) {
-  d.push(i);
-}
 var x = d3.scale.ordinal().rangeBands([0, width]),
     z = d3.scale.linear().domain([0,1]).range([0,1]).clamp(true),
     c = d3.scale.category10();
    
-// var svg;
 function zoom_in(){
     width = 1.5*width;
     height = 1.5*height;
-    // console.log(" width = "+width);
      x = d3.scale.ordinal().domain(d).rangeBands([0, width]);
     // console.log(imp);
     // console.log("x = "+x(1));
@@ -124,27 +124,15 @@ function smaller(){
     console.log("hey");
     d3.json("sub_matrix.json", loadJson_small);
 }
-// function scale1(x) {
-//     range=[1,1080];
-
-//       return range[((index.get(x) || (ranger.t === "range" ? index.set(x, domain.push(x)) : NaN)) - 1) % range.length];
-//     }
-
-
-
 window.svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .style("margin-left", -margin.left + "px")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    console.log("hey");
      d3.json("sub_matrix.json", loadJson);
 console.log("hi");
-var yellow = d3.interpolateYlGn(0), // "rgb(255, 255, 229)"
-    yellowGreen = d3.interpolateYlGn(0.5), // "rgb(120, 197, 120)"
-    green = d3.interpolateYlGn(1); // "rgb(0, 69, 41)"
 
-console.log("yellow:"+yellow);
-
+// console.log("yellow:"+yellow);
+//      d3.select("#abc").attr("ondblclick",function(){alert("HI");});
 </script>
