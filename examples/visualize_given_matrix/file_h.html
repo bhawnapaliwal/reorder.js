@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<!-- important url for color schemes: https://github.com/d3/d3-scale-chromatic -->
+<meta charset="utf-8">
+<title>Matrix Vis</title>
+<body>
+	hi
+	<script> 
+		console.log("script here");
+		window.localStorage.setItem('name', 'Obaseki Nosa');
+		const person = {
+		    name: "Obaseki Nosa",
+		    location: "Lagos",
+		}
+		window.localStorage.setItem('user', JSON.stringify(person));
+		json_i = JSON.parse(window.localStorage.getItem('user'));
+		console.log("parsed: "+json_i.name);
+	</script>
+</body>

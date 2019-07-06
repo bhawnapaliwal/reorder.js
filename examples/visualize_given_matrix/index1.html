@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!-- important url for color schemes: https://github.com/d3/d3-scale-chromatic -->
+<meta charset="utf-8">
+<title>Matrix Vis</title>
+<style>
+
+@import url(../style.css?20120427);
+
+.background {
+  fill: #eee;
+}
+
+line {
+  stroke: #fff;
+}
+
+text.active {
+  fill: red;
+  font-size: 120%;
+}
+
+rect.highlight {
+    fill: none;
+    stroke: red;
+    stroke-width: 2;
+}
+
+</style>
+<script src="../../lib/d3.v3.js"></script>
+<script src="../../lib/science.v1.js"></script>
+<script src="../../lib/tiny-queue.js"></script>
+<script src="../../reorder.v1.js"></script>
+<script src="../matrix1.js"></script>
+<script src="https://d3js.org/d3-color.v1.min.js"></script>
+<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+
+<!-- <aside style="margin-top:80px;">-->
+  Order: <select id="order">
+  <option value="name">by Name</option>
+  <option value="count">by Frequency</option>
+  <option value="group">by Cluster</option>
+  <option value="leafOrder">by Leaf Order</option>
+  <option value="leafOrderDist">by Leaf Order over Distance Matrix</option>
+  <option value="barycenter">by Crossing Reduction</option>
+  <option value="rcm">by Bandwidth Reduction (RCM)</option>
+  <option value="spectral">Spectral</option>
+</select>
+
+<p>Distance: <select id="distance">
+  <option value="manhattan" selected="true">Manhattan</option>
+  <option value="euclidean">Euclidean</option>
+  <option value="chebyshev">Chebyshev</option>
+  <option value="hamming">Hamming</option>
+  <option value="jaccard">Jaccard</option>
+  <option value="braycurtis">Braycurtis</option>
+</select>
+<button onClick="zoom_in()">Zoom In</button>
+<button onClick="zoom_out()">Zoom Out</button>
+<button onClick="smaller()">Sub Sample</button>
+<br>
+window size: <input  name="a" id="a"><br>
+  <!-- Colour Scheme: <select id="cs">
+    <option value="red_blue">Red-Blue</option>
+    <option value="purple_green">Purple-Green</option>
+    <option value="seq_blue">Sequential Blue</option>
+  </select> -->
+<script>
+var margin = {top: 80, right: 0, bottom: 10, left: 80},
+    width = 720,
+    height = 720;
+var x = d3.scale.ordinal().rangeBands([0, width]),
+    z = d3.scale.linear().domain([0,1]).range([0,1]).clamp(true),
+    c = d3.scale.category10();
+var d1=[];
+    for (i = 0; i < 250; i++) {
+      d1.push(i);
+    }
+        var filename="102_102.json";
+
+function zoom_in(){
+    width = 1.5*width;
+    height = 1.5*height;
+     x = d3.scale.ordinal().domain(d1).rangeBands([0, width]);
+    // console.log(imp);
+    // console.log("x = "+x(1));
+    // console.log("imp = "+imp(1));
+    // console.log("scale1 = "+scale1(1));
+    // x = d3.scale.ordinal().rangeBands([0, 1080]),
+    // z = d3.scale.linear().domain([0,1]).range([0,1]).clamp(true),
+    // c = d3.scale.category10();
+    // console.log("yp...."+x.rangeBand());
+     d3.select("body").selectAll("svg").remove();
+window.svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    console.log("hey");
+    d3.json(filename, loadJson);
+
+}
+function zoom_out(){
+    width = width/1.5;
+    height = height/1.5;
+     console.log("hi width = "+width);
+     x = d3.scale.ordinal().domain(d1).rangeBands([0, width]);
+     d3.select("body").selectAll("svg").remove();
+window.svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    console.log("hey");
+    d3.json(filename, loadJson);
+
+}
+function smaller(){
+  d3.select("body").selectAll("svg").remove();
+  window.svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    console.log("hey");
+    d3.json(filename, loadJson_small);
+}
+window.svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+     d3.json(filename, loadJson);
+console.log("hi");
+
+// console.log("yellow:"+yellow);
+//      d3.select("#abc").attr("ondblclick",function(){alert("HI");});
+</script>
