@@ -19,14 +19,16 @@ var colour_map={
   });
 
   json.links.forEach(function(link) {  
+    console.log("link.value: "+link.value);
     matrix[link.source][link.target].z += link.value;
     nodes[link.source].count += link.value;
     nodes[link.target].count += link.value;
   });
   var adjacency = matrix.map(function(row) {
-      return row.map(function(c) { return c.z; });
+      return row.map(function(c) { console.log("c:"); console.log(c); return c.z; });
   });
-
+  console.log("adjacency:");
+  console.log(adjacency);
   var graph = reorder.graph()
     .nodes(json.nodes)
     .links(json.links)
@@ -105,7 +107,8 @@ var colour_map={
   rcm: computeRCM,
   spectral: computeSpectral
     };
-
+    console.log("orders.name: ");
+    console.log(orders.name);
   x.domain(orders.name);
   svg.append("rect")
       .attr("class", "background")
@@ -149,13 +152,12 @@ var colour_map={
 
   function row(row) {
     var cell = d3.select(this).selectAll(".cell")
-    .data(row.filter(function(d) { return d.z; }))
+    .data(row.filter(function(d) { return d.z+1; }))
       .enter().append("rect")
         .attr("class", "cell")
         .attr("x", function(d) { return x(d.x); })
         .attr("width", x.rangeBand())
         .attr("height", x.rangeBand())
-        .style("fill-opacity", function(d) { return z(d.z); })
         .style("fill", function(d) { return d3.interpolateRdBu(d.z); })
         .on("mouseover", mouseover)
         .on("mouseout", mouseout)
@@ -216,7 +218,7 @@ function fun(p)
       {
         console.log("i1: "+i1+" i: "+i);
         console.log("j1: "+j1+" j: "+j);
-        _matrix[i1][j1].z += matrix[orders[corder][i]][orders[corder][j]].z;
+        _matrix[j1][i1].z += matrix[orders[corder][j]][orders[corder][i]].z;
         j1++;
       }
       i1++;
@@ -243,7 +245,7 @@ function fun(p)
       .attr("y", y.rangeBand() / 2)
       .attr("dy", ".32em")
       .attr("text-anchor", "end")
-      .text(function(d, i) { return orders[corder][parseInt(temp1)+i]; });
+      .text(function(d, i) { return orders[corder][parseInt(temp2)+i]; });
     var column = d3.select("#svg2").select("g").selectAll(".column")
       .data(_matrix)
     .enter().append("g")
@@ -258,16 +260,15 @@ function fun(p)
       .attr("y", y.rangeBand() / 2)
       .attr("dy", ".32em")
       .attr("text-anchor", "start")
-      .text(function(d, i) { return orders[corder][parseInt(temp2)+i]; });
+      .text(function(d, i) { return orders[corder][parseInt(temp1)+i]; });
     function row(row) {
     var cell = d3.select(this).selectAll(".cell")
-    .data(row.filter(function(d) { return d.z; }))
+    .data(row.filter(function(d) { return d.z+1; }))
       .enter().append("rect")
         .attr("class", "cell")
         .attr("x", function(d) { return y(d.x); })
         .attr("width", y.rangeBand())
         .attr("height", y.rangeBand())
-        .style("fill-opacity", function(d) { return z(d.z); })
         .style("fill", function(d) { return d3.interpolateRdBu(d.z); });
   }
 }
@@ -547,14 +548,13 @@ function matrix2(matrix)
 
   function row(row) {
     var cell = d3.select(this).selectAll(".cell")
-    .data(row.filter(function(d) { return d.z; }))
+    .data(row.filter(function(d) { return d.z+1; }))
       .enter().append("rect")
         .attr("class", "cell")
         .attr("x", function(d) { return x(d.x); })
         .attr("width", x.rangeBand())
         .attr("height", x.rangeBand())
-        .style("fill-opacity", function(d) { return z(d.z); })
-        .style("fill", function(d) { return d3.interpolateRdBu(d.z); })
+        .style("fill", function(d) { return d3.interpolateRdBu(0); })
         .on("mouseover", mouseover)
         .on("mouseout", mouseout)
         .on("dblclick",fun);
@@ -605,7 +605,7 @@ function matrix2(matrix)
       {
         console.log("i1: "+i1+" i: "+i);
         console.log("j1: "+j1+" j: "+j);
-        _matrix[i1][j1].z += matrix[orders[corder][i]][orders[corder][j]].z;
+        _matrix[j1][i1].z += matrix[orders[corder][j]][orders[corder][i]].z;
         j1++;
       }
       i1++;
@@ -632,7 +632,7 @@ function matrix2(matrix)
       .attr("y", y.rangeBand() / 2)
       .attr("dy", ".32em")
       .attr("text-anchor", "end")
-      .text(function(d, i) { return orders[corder][parseInt(temp1)+i]; });
+      .text(function(d, i) { return orders[corder][parseInt(temp2)+i]; });
     var column = d3.select("#svg2").select("g").selectAll(".column")
       .data(_matrix)
     .enter().append("g")
@@ -647,17 +647,16 @@ function matrix2(matrix)
       .attr("y", y.rangeBand() / 2)
       .attr("dy", ".32em")
       .attr("text-anchor", "start")
-      .text(function(d, i) { return orders[corder][parseInt(temp2)+i];; });
+      .text(function(d, i) { return orders[corder][parseInt(temp1)+i];; });
     function row(row) {
     var cell = d3.select(this).selectAll(".cell")
-    .data(row.filter(function(d) { return d.z; }))
+    .data(row.filter(function(d) { return d.z+1; }))
       .enter().append("rect")
         .attr("class", "cell")
         .attr("x", function(d) { return y(d.x); })
         .attr("width", y.rangeBand())
         .attr("height", y.rangeBand())
-        .style("fill-opacity", function(d) { return z(d.z); })
-        .style("fill", function(d) { return d3.interpolateRdBu(d.z); });
+        .style("fill", function(d) { return d3.interpolateRdBu(0); });
   }
   console.log("printing:");
   console.log((p+1).x);
