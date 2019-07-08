@@ -71,13 +71,15 @@ var margin = {top: 80, right: 0, bottom: 10, left: 80},
     width = 720,
     height = 720;
 var x = d3.scale.ordinal().rangeBands([0, width]),
-    z = d3.scale.linear().domain([0,1]).range([0,1]).clamp(true),
+    z = d3.scale.linear().domain([0,2]).range([0,1]).clamp(true),
     c = d3.scale.category10();
 var d1=[];
-    for (i = 0; i < 250; i++) {
+    for (i = 0; i < 106; i++) {
       d1.push(i);
     }
-        var filename="102_102.json";
+    
+    // x.domain(d1);
+        var filename="all_1.json";
 
 function zoom_in(){
     width = 1.5*width;
