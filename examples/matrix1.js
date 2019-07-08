@@ -169,7 +169,7 @@ function fun(p)
   d3.select("#svg2").remove();
   var len = document.getElementById('a').value;
   console.log("len: "+len);
-  alert("hi p is: "+p.x+" "+p.y+" "+p.z+" doc: "+document.getElementById('a').value);
+  // alert("hi p is: "+p.x+" "+p.y+" "+p.z+" doc: "+document.getElementById('a').value);
   console.log("alerted");
   d3.select("body").append("svg")
     .attr("id","svg2")
@@ -564,7 +564,7 @@ function matrix2(matrix)
   d3.select("#svg2").remove();
   var len = document.getElementById('a').value;
   console.log("len: "+len);
-  alert("hi p is: "+p.x+" "+p.y+" "+p.z+" doc: "+document.getElementById('a').value);
+  // alert("hi p is: "+p.x+" "+p.y+" "+p.z+" doc: "+document.getElementById('a').value);
   console.log("alerted");
   d3.select("body").append("svg")
     .attr("id","svg2")
